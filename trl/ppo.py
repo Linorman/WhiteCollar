@@ -10,7 +10,6 @@ from mindspore import Tensor
 from mindspore import nn
 import collections
 
-
 import time
 import random
 
@@ -91,7 +90,8 @@ class PPOTrainer:
         self.ref_model = ref_model
         self.model = model
         self.tokenizer = tokenizer
-        self.data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
+        ## TODO: DataCollatorForLanguageModeling is editing
+        # self.data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
 
         self.optimizer = Adam(model.parameters(), lr=self.ppo_params['lr'])
 
@@ -181,7 +181,7 @@ class PPOTrainer:
                 "input_ids"]
 
             logits, _, v = self.model(
-                    input_ids)  # logits -> (batch, max_output_len, vocab_size); v -> (batch, max_ouput_len)
+                input_ids)  # logits -> (batch, max_output_len, vocab_size); v -> (batch, max_ouput_len)
             ref_logits, _, _ = self.ref_model(input_ids)
             logprobs = logprobs_from_logits(logits[:, :-1, :], input_ids[:, 1:])  # (batch, seq_len - 1)
             ref_logprobs = logprobs_from_logits(ref_logits[:, :-1, :], input_ids[:, 1:])  # (batch, seq_len - 1)
@@ -257,8 +257,8 @@ class PPOTrainer:
         ratio = ops.exp(logprob - old_logprobs)
         pg_losses = -advantages * ratio  # importance sampling
         pg_losses2 = -advantages * ops.clamp(ratio,
-                                               1.0 - self.ppo_params['cliprange'],
-                                               1.0 + self.ppo_params['cliprange'])
+                                             1.0 - self.ppo_params['cliprange'],
+                                             1.0 + self.ppo_params['cliprange'])
 
         pg_loss = mean(argmax(pg_losses, pg_losses2)[1])
         pg_clipfrac = mean(Tensor(greater(pg_losses2, pg_losses)))
