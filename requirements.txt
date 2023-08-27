@@ -1,7 +1,8 @@
 mindspore==2.0.0
 git+https://openi.pcl.ac.cn/lvyufeng/mindnlp
 
-numpy~=1.21.6
+numpy~=1.24.4
 matplotlib~=3.5.3
 datasets~=2.13.1
 tqdm~=4.66.1
+jieba~=0.42.1
